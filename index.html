@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proposal Kegiatan Vaksinasi Influenza Korporat</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals -->
+    <!-- Application Structure Plan: Aplikasi ini dirancang sebagai dasbor interaktif satu halaman untuk memudahkan pimpinan dalam mengambil keputusan. Strukturnya dibagi menjadi beberapa bagian tematik: 1) Ringkasan Utama, menampilkan metrik kunci secara langsung; 2) Kalkulator Skenario, sebagai inti interaktif untuk simulasi berdasarkan jumlah peserta; 3) Proyeksi Keuntungan, untuk visualisasi potensi finansial; 4) Analisis Kompetitor, untuk memberikan konteks pasar; dan 5) Rincian Biaya, untuk transparansi penuh. Struktur ini dipilih untuk mengubah data statis menjadi alat analisis dinamis, memungkinkan eksplorasi "what-if" secara real-time, yang lebih efektif daripada laporan linear. -->
+    <!-- Visualization & Content Choices: 1) Ringkasan: Kartu statistik (HTML/CSS) untuk menyorot KPI. Goal: Informasi cepat. 2) Kalkulator: Slider (HTML) untuk input interaktif, dihubungkan ke Donut Chart (Chart.js) untuk visualisasi porsi biaya. Goal: Analisis skenario & pemahaman komposisi biaya. 3) Proyeksi Keuntungan: Bar Chart (Chart.js) untuk membandingkan potensi profit di berbagai level partisipasi. Goal: Membandingkan & menyoroti skalabilitas. 4) Analisis Kompetitor: Horizontal Bar Chart (Chart.js) untuk membandingkan harga. Goal: Memposisikan tarif di pasar. Semua visualisasi menggunakan Canvas via Chart.js untuk interaktivitas dan responsivitas. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #FDFBF8;
+            color: #3D405B;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .stat-card {
+            background-color: #FFFFFF;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            transition: transform 0.2s;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        .slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 25px;
+            height: 25px;
+            background: #38A3A5;
+            cursor: pointer;
+            border-radius: 50%;
+        }
+        .slider-track {
+            width: 100%;
+            height: 8px;
+            cursor: pointer;
+            background: #E0E0E0;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <div class="container mx-auto p-4 sm:p-6 lg:p-8">
+        <header class="text-center mb-10">
+            <h1 class="text-3xl md:text-4xl font-bold text-[#38A3A5]">Proposal Vaksinasi Influenza Korporat</h1>
+            <p class="mt-2 text-lg text-gray-600">Analisis Finansial dan Proyeksi untuk Kemitraan dengan BPK Penabur</p>
+        </header>
+
+        <main>
+            <!-- Navigasi -->
+            <nav class="mb-8 bg-white rounded-lg shadow-md p-2 flex justify-center space-x-2 sm:space-x-4">
+                <a href="#ringkasan" class="nav-link text-sm sm:text-base font-medium text-gray-700 hover:text-[#38A3A5] px-3 py-2 rounded-md transition">Ringkasan</a>
+                <a href="#kalkulator" class="nav-link text-sm sm:text-base font-medium text-gray-700 hover:text-[#38A3A5] px-3 py-2 rounded-md transition">Kalkulator Skenario</a>
+                <a href="#proyeksi" class="nav-link text-sm sm:text-base font-medium text-gray-700 hover:text-[#38A3A5] px-3 py-2 rounded-md transition">Proyeksi</a>
+                <a href="#kompetitor" class="nav-link text-sm sm:text-base font-medium text-gray-700 hover:text-[#38A3A5] px-3 py-2 rounded-md transition">Kompetitor</a>
+                <a href="#rincian" class="nav-link text-sm sm:text-base font-medium text-gray-700 hover:text-[#38A3A5] px-3 py-2 rounded-md transition">Rincian Biaya</a>
+            </nav>
+
+            <!-- Ringkasan Eksekutif -->
+            <section id="ringkasan" class="mb-12">
+                <h2 class="text-2xl font-semibold mb-4 text-center">Ringkasan Utama</h2>
+                <p class="text-center text-gray-600 max-w-3xl mx-auto mb-8">
+                    Ringkasan ini menyajikan metrik finansial kunci berdasarkan skenario target 500 peserta. Gunakan kalkulator di bawah untuk menjelajahi berbagai skenario dan dampaknya terhadap biaya dan keuntungan.
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="stat-card text-center">
+                        <h3 class="text-lg font-medium text-gray-500">Tarif Per Peserta</h3>
+                        <p id="summary-tarif" class="text-3xl font-bold text-[#38A3A5] mt-2">Rp 295.000</p>
+                    </div>
+                    <div class="stat-card text-center">
+                        <h3 class="text-lg font-medium text-gray-500">Unit Cost (Target 500)</h3>
+                        <p id="summary-unit-cost" class="text-3xl font-bold text-[#3D405B] mt-2">Rp 0</p>
+                    </div>
+                    <div class="stat-card text-center">
+                        <h3 class="text-lg font-medium text-gray-500">Proyeksi Profit (Target 500)</h3>
+                        <p id="summary-profit" class="text-3xl font-bold text-[#81B29A] mt-2">Rp 0</p>
+                    </div>
+                    <div class="stat-card text-center">
+                        <h3 class="text-lg font-medium text-gray-500">Margin Profit (Target 500)</h3>
+                        <p id="summary-margin" class="text-3xl font-bold text-[#81B29A] mt-2">0%</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Kalkulator Skenario -->
+            <section id="kalkulator" class="mb-12 p-6 bg-white rounded-lg shadow-lg">
+                <h2 class="text-2xl font-semibold mb-2 text-center">Kalkulator Skenario</h2>
+                <p class="text-center text-gray-600 max-w-3xl mx-auto mb-6">
+                    Geser slider di bawah untuk menyesuaikan jumlah peserta vaksinasi. Data finansial akan diperbarui secara otomatis untuk merefleksikan perubahan skenario.
+                </p>
+                <div class="mb-6">
+                    <label for="participant-slider" class="block text-center font-medium mb-2">Jumlah Peserta Vaksinasi: <span id="participant-count" class="font-bold text-[#38A3A5]">500</span> orang</label>
+                    <input id="participant-slider" type="range" min="500" max="800" value="500" step="10" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <h3 class="text-xl font-semibold mb-4 text-center">Estimasi Finansial Skenario</h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between p-3 bg-gray-50 rounded-md">
+                                <span class="font-medium">Total Biaya Vaksin (Setelah Diskon)</span>
+                                <span id="total-vaccine-cost" class="font-bold">Rp 0</span>
+                            </div>
+                            <div class="flex justify-between p-3 bg-gray-50 rounded-md">
+                                <span class="font-medium">Total Biaya Tetap (SDM, Ops, dll)</span>
+                                <span id="total-fixed-cost" class="font-bold">Rp 0</span>
+                            </div>
+                            <div class="flex justify-between p-3 bg-gray-100 rounded-md text-lg">
+                                <span class="font-semibold">Total Estimasi Biaya</span>
+                                <span id="total-cost" class="font-bold text-[#E07A5F]">Rp 0</span>
+                            </div>
+                            <div class="flex justify-between p-3 bg-green-50 rounded-md text-lg">
+                                <span class="font-semibold">Total Proyeksi Pendapatan</span>
+                                <span id="total-revenue" class="font-bold text-[#38A3A5]">Rp 0</span>
+                            </div>
+                            <div class="flex justify-between p-3 bg-green-100 rounded-md text-xl">
+                                <span class="font-bold">Total Proyeksi Keuntungan</span>
+                                <span id="total-profit" class="font-bold text-[#81B29A]">Rp 0</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold mb-4 text-center">Komposisi Biaya</h3>
+                        <div class="chart-container h-64 md:h-80">
+                            <canvas id="cost-breakdown-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Proyeksi Keuntungan -->
+                <section id="proyeksi" class="mb-12 p-6 bg-white rounded-lg shadow-lg">
+                    <h2 class="text-2xl font-semibold mb-2 text-center">Proyeksi Keuntungan</h2>
+                     <p class="text-center text-gray-600 mb-6">
+                        Visualisasi potensi keuntungan pada berbagai tingkat partisipasi peserta, dengan asumsi tarif tetap Rp 295.000 per peserta.
+                    </p>
+                    <div class="chart-container h-80 md:h-96">
+                        <canvas id="profit-projection-chart"></canvas>
+                    </div>
+                </section>
+
+                <!-- Analisis Kompetitor -->
+                <section id="kompetitor" class="mb-12 p-6 bg-white rounded-lg shadow-lg">
+                    <h2 class="text-2xl font-semibold mb-2 text-center">Analisis Kompetitor di Bandung</h2>
+                     <p class="text-center text-gray-600 mb-6">
+                        Perbandingan tarif yang kami usulkan dengan harga layanan vaksinasi influenza sejenis dari klinik lain di area Bandung.
+                    </p>
+                    <div class="chart-container h-80 md:h-96">
+                        <canvas id="competitor-chart"></canvas>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Rincian Biaya -->
+            <section id="rincian" class="mb-12">
+                <h2 class="text-2xl font-semibold text-center mb-6">Rincian Biaya Tetap</h2>
+                <div class="max-w-4xl mx-auto">
+                    <div class="bg-white p-6 rounded-lg shadow-lg">
+                        <div class="border-b border-gray-200">
+                            <nav class="-mb-px flex space-x-6" aria-label="Tabs">
+                                <button class="tab-btn active text-[#38A3A5] whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-[#38A3A5]" data-target="sdm">Sumber Daya Manusia (SDM)</button>
+                                <button class="tab-btn text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent" data-target="operasional">Operasional & Lain-lain</button>
+                                <button class="tab-btn text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent" data-target="marketing">Konsumsi & Merchandise</button>
+                            </nav>
+                        </div>
+                        <div class="mt-6">
+                            <div id="sdm" class="tab-content">
+                                <table class="w-full text-left">
+                                    <thead>
+                                        <tr class="bg-gray-50">
+                                            <th class="p-3 font-medium">Deskripsi</th>
+                                            <th class="p-3 font-medium text-right">Biaya</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td class="p-3 font-semibold text-gray-700" colspan="2">Kegiatan Seminar (1 Hari)</td></tr>
+                                        <tr><td class="p-3 pl-6">Dokter Pembicara (Fee)</td><td class="p-3 text-right">Rp 1.000.000</td></tr>
+                                        <tr><td class="p-3 pl-6">Administrasi (2 org @ 8 jam)</td><td class="p-3 text-right">Rp 240.000</td></tr>
+                                        <tr><td class="p-3 font-semibold text-gray-700" colspan="2">Kegiatan Vaksinasi (2 Hari)</td></tr>
+                                        <tr><td class="p-3 pl-6">Dokter (2 org @ 10 jam/hari)</td><td class="p-3 text-right">Rp 2.000.000</td></tr>
+                                        <tr><td class="p-3 pl-6">Perawat (4 org @ 10 jam/hari)</td><td class="p-3 text-right">Rp 1.600.000</td></tr>
+                                        <tr><td class="p-3 pl-6">Administrasi (4 org @ 10 jam/hari)</td><td class="p-3 text-right">Rp 1.200.000</td></tr>
+                                    </tbody>
+                                    <tfoot>
+                                        <tr class="bg-gray-100 font-bold">
+                                            <td class="p-3">Total Biaya SDM</td>
+                                            <td class="p-3 text-right">Rp 6.040.000</td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                            <div id="operasional" class="tab-content hidden">
+                               <p class="text-gray-600">Total biaya operasional lain-lain untuk seminar dan vaksinasi (termasuk alat kesehatan untuk vaksinasi) dialokasikan sebesar <span class="font-bold">Rp 30.000.000</span>. Alokasi ini mencakup semua kebutuhan pendukung untuk kelancaran acara selama 3 hari.</p>
+                            </div>
+                            <div id="marketing" class="tab-content hidden">
+                                <table class="w-full text-left">
+                                    <thead>
+                                        <tr class="bg-gray-50">
+                                            <th class="p-3 font-medium">Item</th>
+                                            <th class="p-3 font-medium text-right">Biaya</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td class="p-3">Konsumsi (Peserta & Panitia)</td><td class="p-3 text-right">Rp 10.000.000</td></tr>
+                                        <tr><td class="p-3">Merchandise Seminar</td><td class="p-3 text-right">Rp 5.000.000</td></tr>
+                                    </tbody>
+                                    <tfoot>
+                                        <tr class="bg-gray-100 font-bold">
+                                            <td class="p-3">Total Biaya Konsumsi & Merchandise</td>
+                                            <td class="p-3 text-right">Rp 15.000.000</td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="text-center mt-12 text-gray-500 text-sm">
+            <p>&copy; 2025 Analisis Proposal Klinik. Dibuat untuk pengambilan keputusan strategis.</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const participantSlider = document.getElementById('participant-slider');
+            const participantCount = document.getElementById('participant-count');
+
+            const VACCINE_PRICE_BASE = 120100;
+            const VACCINE_PPN = 1.11;
+            const VACCINE_PRICE_WITH_PPN = VACCINE_PRICE_BASE * VACCINE_PPN;
+            const PROPOSED_TARIFF = 295000;
+
+            const FIXED_COST_SDM = 6040000;
+            const FIXED_COST_OPERASIONAL = 30000000;
+            const FIXED_COST_KONSUMSI_MERCH = 15000000;
+            const TOTAL_FIXED_COST = FIXED_COST_SDM + FIXED_COST_OPERASIONAL + FIXED_COST_KONSUMSI_MERCH;
+            
+            let costBreakdownChart, profitProjectionChart, competitorChart;
+
+            function formatCurrency(value) {
+                return new Intl.NumberFormat('id-ID', {
+                    style: 'currency',
+                    currency: 'IDR',
+                    minimumFractionDigits: 0
+                }).format(value);
+            }
+
+            function getDiscount(quantity) {
+                if (quantity > 202) return 0.15;
+                if (quantity >= 100) return 0.10;
+                if (quantity >= 52) return 0.05;
+                if (quantity >= 20) return 0.025;
+                return 0;
+            }
+
+            function calculateFinancials(participants) {
+                const discount = getDiscount(participants);
+                const discountedVaccinePrice = VACCINE_PRICE_WITH_PPN * (1 - discount);
+                const totalVaccineCost = discountedVaccinePrice * participants;
+                const totalCost = totalVaccineCost + TOTAL_FIXED_COST;
+                const unitCost = totalCost / participants;
+                const totalRevenue = PROPOSED_TARIFF * participants;
+                const totalProfit = totalRevenue - totalCost;
+                const profitMargin = totalRevenue > 0 ? (totalProfit / totalRevenue) * 100 : 0;
+
+                return {
+                    participants,
+                    totalVaccineCost,
+                    totalCost,
+                    unitCost,
+                    totalRevenue,
+                    totalProfit,
+                    profitMargin
+                };
+            }
+
+            function updateDashboard(participants) {
+                const financials = calculateFinancials(participants);
+
+                participantCount.textContent = participants;
+                
+                document.getElementById('total-vaccine-cost').textContent = formatCurrency(financials.totalVaccineCost);
+                document.getElementById('total-fixed-cost').textContent = formatCurrency(TOTAL_FIXED_COST);
+                document.getElementById('total-cost').textContent = formatCurrency(financials.totalCost);
+                document.getElementById('total-revenue').textContent = formatCurrency(financials.totalRevenue);
+                document.getElementById('total-profit').textContent = formatCurrency(financials.totalProfit);
+
+                updateCostBreakdownChart(financials.totalVaccineCost);
+
+                if (participants == 500) {
+                     document.getElementById('summary-unit-cost').textContent = formatCurrency(financials.unitCost);
+                     document.getElementById('summary-profit').textContent = formatCurrency(financials.totalProfit);
+                     document.getElementById('summary-margin').textContent = `${financials.profitMargin.toFixed(1)}%`;
+                }
+            }
+
+            function updateCostBreakdownChart(vaccineCost) {
+                costBreakdownChart.data.datasets[0].data = [vaccineCost, FIXED_COST_SDM, FIXED_COST_OPERASIONAL + FIXED_COST_KONSUMSI_MERCH];
+                costBreakdownChart.update();
+            }
+
+            function initCostBreakdownChart() {
+                const ctx = document.getElementById('cost-breakdown-chart').getContext('2d');
+                costBreakdownChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Biaya Vaksin', 'Biaya SDM', 'Biaya Operasional & Lainnya'],
+                        datasets: [{
+                            data: [0, 0, 0],
+                            backgroundColor: ['#38A3A5', '#81B29A', '#F6BD60'],
+                            borderColor: '#FDFBF8',
+                            borderWidth: 4,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed !== null) {
+                                            label += formatCurrency(context.parsed);
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            function initProfitProjectionChart() {
+                const scenarios = [500, 600, 700, 800];
+                const profits = scenarios.map(p => calculateFinancials(p).totalProfit);
+                const ctx = document.getElementById('profit-projection-chart').getContext('2d');
+
+                profitProjectionChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: scenarios.map(p => `${p} Peserta`),
+                        datasets: [{
+                            label: 'Proyeksi Keuntungan',
+                            data: profits,
+                            backgroundColor: '#81B29A',
+                            borderRadius: 6,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: value => formatCurrency(value)
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: context => formatCurrency(context.raw)
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            function initCompetitorChart() {
+                const competitorData = [
+                    { clinic: 'Imuni.id', price: 325000 },
+                    { clinic: 'Klinik Pratama Amanda', price: 295000 },
+                    { clinic: 'Klinik Widya (via HDmall)', price: 266000 },
+                ];
+                const ourData = { clinic: 'Klinik Prima', price: PROPOSED_TARIFF };
+
+                const allData = [...competitorData, ourData].sort((a, b) => b.price - a.price);
+                
+                const ctx = document.getElementById('competitor-chart').getContext('2d');
+                competitorChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: allData.map(d => d.clinic),
+                        datasets: [{
+                            label: 'Harga Vaksin Influenza',
+                            data: allData.map(d => d.price),
+                            backgroundColor: allData.map(d => d.clinic === ourData.clinic ? '#38A3A5' : '#F6BD60'),
+                            borderRadius: 6,
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                ticks: {
+                                    callback: value => formatCurrency(value)
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: context => formatCurrency(context.raw)
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            participantSlider.addEventListener('input', (e) => {
+                updateDashboard(parseInt(e.target.value));
+            });
+
+            const tabs = document.querySelectorAll('.tab-btn');
+            const contents = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('active', 'text-[#38A3A5]', 'border-[#38A3A5]'));
+                    tabs.forEach(t => t.classList.add('text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300', 'border-transparent'));
+                    
+                    tab.classList.add('active', 'text-[#38A3A5]', 'border-[#38A3A5]');
+                    tab.classList.remove('text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300', 'border-transparent');
+                    
+                    contents.forEach(c => c.classList.add('hidden'));
+                    document.getElementById(tab.dataset.target).classList.remove('hidden');
+                });
+            });
+            
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            initCostBreakdownChart();
+            initProfitProjectionChart();
+            initCompetitorChart();
+            updateDashboard(500); 
+        });
+    </script>
+</body>
+</html>
